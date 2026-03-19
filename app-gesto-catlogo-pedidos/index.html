@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ── Viewport mobile-first ── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+
+    <!-- ── Primary Meta ── -->
+    <title>Catálogo de Flores e Plantas</title>
+    <meta name="description" content="Aplicativo de gerenciamento de catálogo de plantas e criação de pedidos para lojas de flores e plantas." />
+    <meta name="keywords" content="flores, plantas, catálogo, pedidos, loja, garden" />
+    <meta name="author" content="Garden Order" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- ── Theme Color ── -->
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="msapplication-TileColor" content="#16a34a" />
+    <meta name="msapplication-navbutton-color" content="#16a34a" />
+
+    <!-- ── PWA Manifest ── -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ── Apple / iOS PWA ── -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Catálogo Flores" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Apple touch icons (gerados via SVG data URI) -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/icon-128.png" />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2316a34a'/%3E%3Ctext y='.9em' font-size='75' x='12' fill='white'%3E🌸%3C/text%3E%3C/svg%3E" />
+    <link rel="shortcut icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2316a34a'/%3E%3Ctext y='.9em' font-size='75' x='12' fill='white'%3E🌸%3C/text%3E%3C/svg%3E" />
+
+    <!-- ── Open Graph ── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Catálogo de Flores e Plantas" />
+    <meta property="og:description" content="Gerenciamento de catálogo de plantas e criação de pedidos." />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- ── Splash Screens iOS ── -->
+    <!-- iPhone 14 Pro Max -->
+    <link rel="apple-touch-startup-image"
+      media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+      href="/splash-1290x2796.png" />
+    <!-- iPhone 14 Pro -->
+    <link rel="apple-touch-startup-image"
+      media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)"
+      href="/splash-1179x2556.png" />
+    <!-- iPhone SE -->
+    <link rel="apple-touch-startup-image"
+      media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+      href="/splash-750x1334.png" />
+
+    <!-- ── Preconnect Firebase ── -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" />
+    <link rel="preconnect" href="https://www.googleapis.com" />
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+
+    <!-- ── Safe Area support ── -->
+    <style>
+      :root {
+        --sat: env(safe-area-inset-top, 0px);
+        --sar: env(safe-area-inset-right, 0px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sal: env(safe-area-inset-left, 0px);
+      }
+      html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        background: #071810;
+        overflow: hidden;
+      }
+      /* Tela de carregamento inicial */
+      #splash {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(160deg, #071810 0%, #0d2318 50%, #071810 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+      }
+      #splash.hidden { opacity: 0; pointer-events: none; }
+      #splash .icon {
+        font-size: 72px;
+        animation: pulse 1.5s ease-in-out infinite;
+        margin-bottom: 24px;
+      }
+      #splash .title {
+        color: #e8fdf0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 1.3;
+        margin-bottom: 8px;
+      }
+      #splash .sub {
+        color: #4ade80;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 13px;
+        text-align: center;
+        opacity: 0.8;
+        margin-bottom: 40px;
+      }
+      #splash .loader {
+        width: 40px; height: 4px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      #splash .loader-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e, #4ade80);
+        border-radius: 2px;
+        animation: load 1.8s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
+      @keyframes load {
+        0% { width: 0%; transform: translateX(0); }
+        50% { width: 70%; }
+        100% { width: 100%; transform: translateX(100%); }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ── Splash Screen ── -->
+    <div id="splash">
+      <div class="icon">🌸</div>
+      <div class="title">Catálogo de<br/>Flores e Plantas</div>
+      <div class="sub">Carregando...</div>
+      <div class="loader"><div class="loader-bar"></div></div>
+    </div>
+
+    <!-- ── App Root ── -->
+    <div id="root"></div>
+
+    <!-- ── App Entry ── -->
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ── Service Worker Registration ── -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .then((reg) => {
+              console.log('[SW] Registered:', reg.scope);
+              // Atualiza SW quando nova versão disponível
+              reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                if (newWorker) {
+                  newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('[SW] Nova versão disponível!');
+                    }
+                  });
+                }
+              });
+            })
+            .catch((err) => console.log('[SW] Registration failed:', err));
+        });
+      }
+
+      // Remove splash quando o React montar
+      window.addEventListener('DOMContentLoaded', () => {
+        const observer = new MutationObserver(() => {
+          const root = document.getElementById('root');
+          if (root && root.children.length > 0) {
+            setTimeout(() => {
+              const splash = document.getElementById('splash');
+              if (splash) {
+                splash.classList.add('hidden');
+                setTimeout(() => splash.remove(), 500);
+              }
+            }, 300);
+            observer.disconnect();
+          }
+        });
+        const root = document.getElementById('root');
+        if (root) observer.observe(root, { childList: true });
+      });
+
+      // Detecta modo standalone (PWA instalado)
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        document.documentElement.classList.add('pwa-standalone');
+        console.log('[PWA] Running in standalone mode');
+      }
+
+      // Previne zoom em double-tap no iOS
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) e.preventDefault();
+        lastTouchEnd = now;
+      }, { passive: false });
+    </script>
+  </body>
+</html>

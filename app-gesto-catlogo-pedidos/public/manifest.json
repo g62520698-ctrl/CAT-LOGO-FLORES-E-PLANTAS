@@ -1,0 +1,53 @@
+{
+  "name": "Catálogo de Flores e Plantas",
+  "short_name": "Catálogo Flores",
+  "description": "Aplicativo de gerenciamento de catálogo de plantas e criação de pedidos para lojas.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#071810",
+  "theme_color": "#16a34a",
+  "lang": "pt-BR",
+  "scope": "/",
+  "categories": ["business", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%2316a34a'/%3E%3Ctext y='380' x='80' font-size='360' fill='white'%3E🌸%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo de Produtos",
+      "short_name": "Catálogo",
+      "description": "Abrir catálogo de flores e plantas",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Meus Pedidos",
+      "short_name": "Pedidos",
+      "description": "Ver histórico de pedidos",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "Catálogo de Flores e Plantas"
+    }
+  ]
+}
