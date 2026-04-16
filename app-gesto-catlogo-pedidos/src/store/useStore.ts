@@ -381,8 +381,13 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
   if (FIREBASE_ENABLED && isDbReady()) {
-    fbSet(COLLECTIONS.ORDERS, order.id, order).then(ok => {
-      if (!ok) {
+ fbSet(COLLECTIONS.ORDERS, order.id, order)
+  .then(ok => {
+    console.log("SALVOU NO FIREBASE?", ok);
+  })
+  .catch(err => {
+    console.error("ERRO AO SALVAR PEDIDO:", err);
+  });
         setOrdersState(prev => {
           const updated = [order, ...prev];
           save(SK.ORDERS, updated);
