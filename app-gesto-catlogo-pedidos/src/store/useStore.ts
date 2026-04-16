@@ -443,17 +443,22 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   }, []);
 
   // ── Users ──────────────────────────────────────────────────────────────────
-  const addUser = useCallback((user: User) => {
-    if (FIREBASE_ENABLED && isDbReady()) {
-      fbSet(COLLECTIONS.USERS, user.id, user);
-    } else {
-      setUsersState(prev => {
-        const updated = [...prev, user];
-        save(SK.USERS, updated);
-        return updated;
-      });
-    }
-  }, []);
+const addUser = useCallback((user: User) => {
+  const newUser = {
+    ...user,
+    id: user.id || user-${Date.now()}
+  };
+
+  if (FIREBASE_ENABLED && isDbReady()) {
+    fbSet(COLLECTIONS.USERS, newUser.id, newUser);
+  } else {
+    setUsersState(prev => {
+      const updated = [...prev, newUser];
+      save(SK.USERS, updated);
+      return updated;
+    });
+  }
+}, []);
 
   const updateUser = useCallback((user: User) => {
     if (FIREBASE_ENABLED && isDbReady()) {
