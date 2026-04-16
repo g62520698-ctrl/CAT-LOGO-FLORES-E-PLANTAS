@@ -358,12 +358,10 @@ export function useStore() {
     const itens: OrderItem[] = cartItems.map(item => ({
       codigo_produto:           item.produto.codigo,
       nome:                     item.produto.nome,
-      descricao:                item.produto.descricao,
       quantidade:               item.quantidade,
       quantidade_minima_camada: item.produto.quantidade_minima_camada,
       vasos_bandeja:            item.produto.vasos_bandeja,
       bandejas:                 Math.ceil(item.quantidade / (item.produto.vasos_bandeja || 1)),
-      imagem:                   item.produto.imagem || '',
     }));
 
     const order: Order = {
