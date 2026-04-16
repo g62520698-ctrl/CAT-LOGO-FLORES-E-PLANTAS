@@ -461,9 +461,9 @@ const updateProduct = useCallback((product) => {
   // ── Users ──────────────────────────────────────────────────────────────────
 const addUser = useCallback((user: User) => {
   const newUser = {
-    ...user,
-    id: user.id || user-${Date.now()}
-  };
+  ...user,
+  id: user.id || `user-${Date.now()}`
+};
 
   if (FIREBASE_ENABLED && isDbReady()) {
     fbSet(COLLECTIONS.USERS, newUser.id, newUser);
