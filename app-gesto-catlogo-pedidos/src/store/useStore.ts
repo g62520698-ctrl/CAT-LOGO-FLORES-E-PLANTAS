@@ -344,65 +344,62 @@ export function useStore() {
   }, []);
 
   // ── Orders ─────────────────────────────────────────────────────────────────
-  const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | null => {
-    if (!user || cartItems.length === 0) return null;
+const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | null => {
+  if (!user || cartItems.length === 0) return null;
 
-    const now    = new Date();
-    const data   = now.toLocaleDateString('pt-BR');
-    const hora   = now.toLocaleTimeString('pt-BR');
-    const counter = load<number>(SK.ORDER_COUNTER, 1);
-    const newCounter = counter + 1;
-    save(SK.ORDER_COUNTER, newCounter);
-    setOrderCounterState(newCounter);
+  const now    = new Date();
+  const data   = now.toLocaleDateString('pt-BR');
+  const hora   = now.toLocaleTimeString('pt-BR');
+  const counter = load<number>(SK.ORDER_COUNTER, 1);
+  const newCounter = counter + 1;
+  save(SK.ORDER_COUNTER, newCounter);
+  setOrderCounterState(newCounter);
 
-    const itens: OrderItem[] = cartItems.map(item => ({
-      codigo_produto:           item.produto.codigo,
-      nome:                     item.produto.nome,
-      quantidade:               item.quantidade,
-      quantidade_minima_camada: item.produto.quantidade_minima_camada,
-      vasos_bandeja:            item.produto.vasos_bandeja,
-      bandejas:                 Math.ceil(item.quantidade / (item.produto.vasos_bandeja || 1)),
-    }));
+  // 🔥 ITENS LEVES (CORRETO)
+  const itens: OrderItem[] = cartItems.map(item => ({
+    codigo_produto: item.produto.codigo,
+    quantidade: item.quantidade
+  }));
 
-    const order: Order = {
-      id:          `ORD-${Date.now()}`,
-      numero:      counter,
-      usuario:     user.login,
-      usuarioNome: user.nome,
-      usuarioRole: user.role,
-      data,
-      hora,
-      dataISO:     now.toISOString(),
-      itens,
-      status:      'pendente',
-    };
+  const order: Order = {
+    id: `ORD-${Date.now()}`,
+    numero: counter,
+    usuario: user.login,
+    usuarioNome: user.nome,
+    usuarioRole: user.role,
+    data,
+    hora,
+    dataISO: now.toISOString(),
+    itens,
+    status: 'pendente',
+  };
 
-    if (FIREBASE_ENABLED && isDbReady()) {
-      fbSet(COLLECTIONS.ORDERS, order.id, order).then(ok => {
-        if (!ok) {
-          // Firestore failed — update local state as fallback
-          setOrdersState(prev => {
-            const updated = [order, ...prev];
-            save(SK.ORDERS, updated);
-            return updated;
-          });
-        }
-        // If ok, the real-time listener will update state automatically
-      });
-    } else {
-      setOrdersState(prev => {
-        const updated = [order, ...prev];
-        save(SK.ORDERS, updated);
-        return updated;
-      });
-    }
+  // 🔍 DEBUG
+  console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
-    // Clear cart immediately
-    setCartState([]);
-    save(SK.CART, []);
+  if (FIREBASE_ENABLED && isDbReady()) {
+    fbSet(COLLECTIONS.ORDERS, order.id, order).then(ok => {
+      if (!ok) {
+        setOrdersState(prev => {
+          const updated = [order, ...prev];
+          save(SK.ORDERS, updated);
+          return updated;
+        });
+      }
+    });
+  } else {
+    setOrdersState(prev => {
+      const updated = [order, ...prev];
+      save(SK.ORDERS, updated);
+      return updated;
+    });
+  }
 
-    return order;
-  }, []);
+  setCartState([]);
+  save(SK.CART, []);
+
+  return order;
+}, []);
 
   // ── Products ───────────────────────────────────────────────────────────────
   const addProduct = useCallback((product: Product) => {
