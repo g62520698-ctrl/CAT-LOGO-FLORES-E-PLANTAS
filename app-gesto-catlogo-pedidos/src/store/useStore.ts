@@ -202,9 +202,12 @@ export function useStore() {
           }
         }
 
-        if (vUsers.length === 0) {
-          await Promise.all(defaultUsers.map(u => fbSet(COLLECTIONS.USERS, u.id, u)));
-        } else {
+       if (vUsers.length === 0) {
+  console.log("Criando usuários no Firebase...");
+  await Promise.all(defaultUsers.map(u => 
+    fbSet(COLLECTIONS.USERS, u.id, u)
+  ));
+} else {
           if (mountedRef.current) {
             setUsers.current(vUsers);
             save(SK.USERS, vUsers);
