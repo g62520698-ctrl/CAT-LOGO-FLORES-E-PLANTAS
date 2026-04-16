@@ -378,7 +378,7 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   };
 
   // 🔍 DEBUG
-  console.log("PEDIDO ENVIADO:", JSON.stringify(order));
+console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
 if (FIREBASE_ENABLED && isDbReady()) {
   fbSet(COLLECTIONS.ORDERS, order.id, order)
@@ -388,48 +388,63 @@ if (FIREBASE_ENABLED && isDbReady()) {
       if (!ok) {
         console.warn("Firebase falhou, salvando local");
         setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+      } else {
+        setOrdersState(prev => {
+          const updated = [order, ...prev];
+          save(SK.ORDERS, updated);
+          return updated;
+        });
       }
     })
     .catch(err => {
       console.error("ERRO AO SALVAR PEDIDO:", err);
       setOrdersState(prev => [order, ...prev.slice(0, 20)]);
     });
+
 } else {
   // fallback offline
-  setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+  setOrdersState(prev => {
+    const updated = [order, ...prev];
+    save(SK.ORDERS, updated);
+    return updated;
+  });
 }
 
-// limpa carrinho (SEM salvar no localStorage)
+// limpa carrinho
 setCartState([]);
+save(SK.CART, []);
 
 return order;
-}, []);
 
   // ── Products ───────────────────────────────────────────────────────────────
-  const addProduct = useCallback((product: Product) => {
-    if (FIREBASE_ENABLED && isDbReady()) {
-      fbSet(COLLECTIONS.PRODUCTS, product.codigo, product);
-      // Listener updates state automatically
-    } else {
-      setProductsState(prev => {
-        const updated = [...prev.filter(p => p.codigo !== product.codigo), product];
-        save(SK.PRODUCTS, updated);
-        return updated;
-      });
-    }
-  }, []);
+const addProduct = useCallback((product) => {
+  if (FIREBASE_ENABLED && isDbReady()) {
+    fbSet(COLLECTIONS.PRODUCTS, product.codigo, product);
+  } else {
+    setProductsState(prev => {
+      const updated = [
+        ...prev.filter(p => p.codigo !== product.codigo),
+        product
+      ];
+      save(SK.PRODUCTS, updated);
+      return updated;
+    });
+  }
+}, []);
 
-  const updateProduct = useCallback((product: Product) => {
-    if (FIREBASE_ENABLED && isDbReady()) {
-      fbSet(COLLECTIONS.PRODUCTS, product.codigo, product);
-    } else {
-      setProductsState(prev => {
-        const updated = prev.map(p => p.codigo === product.codigo ? product : p);
-        save(SK.PRODUCTS, updated);
-        return updated;
-      });
-    }
-  }, []);
+const updateProduct = useCallback((product) => {
+  if (FIREBASE_ENABLED && isDbReady()) {
+    fbSet(COLLECTIONS.PRODUCTS, product.codigo, product);
+  } else {
+    setProductsState(prev => {
+      const updated = prev.map(p =>
+        p.codigo === product.codigo ? product : p
+      );
+      save(SK.PRODUCTS, updated);
+      return updated;
+    });
+  }
+}, []);
 
   const deleteProduct = useCallback((codigo: string) => {
     if (FIREBASE_ENABLED && isDbReady()) {
