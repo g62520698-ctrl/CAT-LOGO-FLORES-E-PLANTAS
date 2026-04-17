@@ -369,8 +369,8 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
     bandejas: Math.ceil(item.quantidade / (item.produto.vasos_bandeja || 1)),
   }));
 
- const order: Order = {
-  id: ORD-${Date.now()},
+const order: Order = {
+  id: `ORD-${Date.now()}`,
   numero: counter,
   usuario: user.login,
   usuarioNome: user.nome,
