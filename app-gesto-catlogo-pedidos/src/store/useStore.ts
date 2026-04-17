@@ -227,7 +227,7 @@ export function useStore() {
           COLLECTIONS.PRODUCTS,
           (items) => {
             if (seedingRef.current) return;
-            const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
+            const valid = Array.isArray(items) ? items.filter(isValidProduct) : [];
             if (valid.length > 0) {
               setProducts.current(valid);
               save(SK.PRODUCTS, valid);
@@ -240,7 +240,7 @@ export function useStore() {
           COLLECTIONS.USERS,
           (items) => {
             if (seedingRef.current) return;
-            const valid = items.filter(isValidUser);
+            const valid = Array.isArray(items) ? items.filter(isValiduser) : [];
             if (valid.length > 0) {
               setUsers.current(valid);
               save(SK.USERS, valid);
@@ -251,7 +251,7 @@ export function useStore() {
         const unsubOrds = fbListen<Order>(
           COLLECTIONS.ORDERS,
           (items) => {
-            const valid = items.filter(isValidOrder);
+            const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
             setOrders.current(valid);
             save(SK.ORDERS, valid);
           }
