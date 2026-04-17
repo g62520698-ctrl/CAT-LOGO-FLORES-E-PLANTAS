@@ -442,7 +442,6 @@ if (FIREBASE_ENABLED && isDbReady()) {
     });
 
 } else {
-  // fallback offline
   setOrdersState(prev => {
     const updated = [order, ...prev];
     save(SK.ORDERS, updated);
@@ -450,14 +449,12 @@ if (FIREBASE_ENABLED && isDbReady()) {
   });
 }
 
-// limpa carrinho
 setCartState([]);
 save(SK.CART, []);
 
 return order;
 
 }, []);
-
   // ── Products ───────────────────────────────────────────────────────────────
 const addProduct = useCallback((product) => {
   if (FIREBASE_ENABLED && isDbReady()) {
