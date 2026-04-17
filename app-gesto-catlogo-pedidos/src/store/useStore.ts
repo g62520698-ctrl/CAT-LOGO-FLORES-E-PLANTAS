@@ -251,10 +251,21 @@ export function useStore() {
      const unsubOrds = fbListen<Order>(
   COLLECTIONS.ORDERS,
   (items) => {
-    const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
+    if (!Array.isArray(items)) {
+  console.warn("⚠️ items inválido no listener de orders:", items);
+  return;
+}
 
-    setOrders.current(valid);
-    save(SK.ORDERS, valid);
+const valid = items.filter(isValidOrder);
+
+// 🔒 NÃO ATUALIZA COM ARRAY VAZIO SE JÁ TEM DADOS
+if (valid.length === 0) {
+  console.warn("⚠️ lista vazia ignorada (evita crash)");
+  return;
+}
+
+setOrders.current(valid);
+save(SK.ORDERS, valid);
   }
 );
 
