@@ -417,8 +417,6 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
 
 }, []);
 
-}, []);
-
 // 🔍 DEBUG
 console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
