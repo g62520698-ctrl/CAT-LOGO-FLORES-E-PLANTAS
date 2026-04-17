@@ -227,7 +227,7 @@ export function useStore() {
           COLLECTIONS.PRODUCTS,
           (items) => {
             if (seedingRef.current) return;
-            const valid = items.filter(isValidProduct);
+            const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
             if (valid.length > 0) {
               setProducts.current(valid);
               save(SK.PRODUCTS, valid);
