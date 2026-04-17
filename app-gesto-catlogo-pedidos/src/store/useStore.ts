@@ -360,7 +360,6 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   save(SK.ORDER_COUNTER, newCounter);
   setOrderCounterState(newCounter);
 
-  // ✅ ITENS LEVES (SEM IMAGEM)
   const itens: OrderItem[] = cartItems.map(item => ({
     codigo_produto: item.produto.codigo,
     nome: item.produto.nome,
@@ -371,7 +370,7 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   }));
 
   const order: Order = {
-id: `ORD-${Date.now()}`,
+    id: ORD-${Date.now()},
     numero: counter,
     usuario: user.login,
     usuarioNome: user.nome,
@@ -387,33 +386,23 @@ id: `ORD-${Date.now()}`,
 
   if (FIREBASE_ENABLED && isDbReady()) {
     fbSet(COLLECTIONS.ORDERS, order.id, order)
-      .then(ok => {
-        console.log("SALVOU NO FIREBASE?", ok);
-
-        // 🔥 sempre atualiza estado local também
+      .then(() => {
         setOrdersState(prev => {
           const updated = [order, ...prev];
           save(SK.ORDERS, updated);
           return updated;
         });
-
-        if (!ok) {
-          console.warn("Firebase falhou (mas salvou local)");
-        }
       })
       .catch(err => {
         console.error("ERRO AO SALVAR PEDIDO:", err);
 
-        // fallback
         setOrdersState(prev => {
           const updated = [order, ...prev];
           save(SK.ORDERS, updated);
           return updated;
         });
       });
-
   } else {
-    // fallback offline
     setOrdersState(prev => {
       const updated = [order, ...prev];
       save(SK.ORDERS, updated);
@@ -421,7 +410,6 @@ id: `ORD-${Date.now()}`,
     });
   }
 
-  // limpa carrinho
   setCartState([]);
   save(SK.CART, []);
 
@@ -429,7 +417,9 @@ id: `ORD-${Date.now()}`,
 
 }, []);
 
-  // 🔍 DEBUG
+}, []);
+
+// 🔍 DEBUG
 console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
 if (FIREBASE_ENABLED && isDbReady()) {
