@@ -214,11 +214,11 @@ export function useStore() {
           }
         }
 
-        if (vOrds.length > 0 && mountedRef.current) {
-          setOrders.current(vOrds);
-          save(SK.ORDERS, vOrds);
-        }
-
+        if (mountedRef.current) {
+  setOrders.current(vOrds);
+  save(SK.ORDERS, vOrds);
+}
+        
         seedingRef.current = false;
         if (!mountedRef.current) return;
 
