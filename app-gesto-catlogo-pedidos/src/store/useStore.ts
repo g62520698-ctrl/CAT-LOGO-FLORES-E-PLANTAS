@@ -252,7 +252,7 @@ export function useStore() {
           COLLECTIONS.ORDERS,
           (items) => {
             const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
-            setOrders.current(valid);
+            setOrders.current(Array.isArray(valid) ? valid : []);
             save(SK.ORDERS, valid);
           }
         );
@@ -543,7 +543,7 @@ const addUser = useCallback((user: User) => {
     products, addProduct, updateProduct, deleteProduct,
     users, addUser, updateUser, deleteUser,
     cart, cartCount, cartItemCount, addToCart, updateCartItem, removeFromCart, clearCart,
-    orders, finalizeOrder, completeOrder, deleteOrder,
+    orders: Array.isArray(orders) ? orders : [], finalizeOrder, completeOrder, deleteOrder,
     currentUser, setCurrentUser,
     settings, setSettings,
     firebaseStatus,
