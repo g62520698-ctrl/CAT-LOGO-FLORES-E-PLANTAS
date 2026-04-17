@@ -417,44 +417,6 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
 
 }, []);
 
-// 🔍 DEBUG
-console.log("PEDIDO ENVIADO:", JSON.stringify(order));
-
-if (FIREBASE_ENABLED && isDbReady()) {
-  fbSet(COLLECTIONS.ORDERS, order.id, order)
-    .then(ok => {
-      console.log("SALVOU NO FIREBASE?", ok);
-
-      if (!ok) {
-        console.warn("Firebase falhou, salvando local");
-        setOrdersState(prev => [order, ...prev.slice(0, 20)]);
-      } else {
-        setOrdersState(prev => {
-          const updated = [order, ...prev];
-          save(SK.ORDERS, updated);
-          return updated;
-        });
-      }
-    })
-    .catch(err => {
-      console.error("ERRO AO SALVAR PEDIDO:", err);
-      setOrdersState(prev => [order, ...prev.slice(0, 20)]);
-    });
-
-} else {
-  setOrdersState(prev => {
-    const updated = [order, ...prev];
-    save(SK.ORDERS, updated);
-    return updated;
-  });
-}
-
-setCartState([]);
-save(SK.CART, []);
-
-return order;
-
-}, []);
   // ── Products ───────────────────────────────────────────────────────────────
 const addProduct = useCallback((product) => {
   if (FIREBASE_ENABLED && isDbReady()) {
