@@ -347,7 +347,7 @@ export function useStore() {
   }, []);
 
   // ── Orders ─────────────────────────────────────────────────────────────────
-const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | null => {
+const finalizeOrder = useCallback(async (user: User, cartItems: CartItem[]): Promise<Order | null> => {
   if (!user || cartItems.length === 0) return null;
 
   const now = new Date();
@@ -383,26 +383,26 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   };
 
   console.log("PEDIDO ENVIADO:", JSON.stringify(order));
+  
+console.log("Firebase ativo?", FIREBASE_ENABLED);
+console.log("DB pronto?", isDbReady());
+  
+if (FIREBASE_ENABLED && isDbReady()) {
+  try {
+    await fbSet(COLLECTIONS.ORDERS, order.id, order);
 
-  if (FIREBASE_ENABLED && isDbReady()) {
-    fbSet(COLLECTIONS.ORDERS, order.id, order)
-      .then(() => {
-        setOrdersState(prev => {
-          const updated = [order, ...prev];
-          save(SK.ORDERS, updated);
-          return updated;
-        });
-      })
-      .catch(err => {
-        console.error("ERRO AO SALVAR PEDIDO:", err);
+    console.log("✅ Pedido salvo no Firebase");
 
-        setOrdersState(prev => {
-          const updated = [order, ...prev];
-          save(SK.ORDERS, updated);
-          return updated;
-        });
-      });
-  } else {
+    setOrdersState(prev => {
+      const updated = [order, ...prev];
+      save(SK.ORDERS, updated);
+      return updated;
+    });
+
+  } catch (err) {
+    console.error("❌ ERRO AO SALVAR PEDIDO:", err);
+
+    // fallback local
     setOrdersState(prev => {
       const updated = [order, ...prev];
       save(SK.ORDERS, updated);
@@ -410,6 +410,13 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
     });
   }
 
+} else {
+  setOrdersState(prev => {
+    const updated = [order, ...prev];
+    save(SK.ORDERS, updated);
+    return updated;
+  });
+}
   setCartState([]);
   save(SK.CART, []);
 
