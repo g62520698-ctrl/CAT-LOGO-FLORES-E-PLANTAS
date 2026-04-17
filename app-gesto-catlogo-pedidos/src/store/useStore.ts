@@ -455,6 +455,8 @@ save(SK.CART, []);
 
 return order;
 
+}, []);
+
   // ── Products ───────────────────────────────────────────────────────────────
 const addProduct = useCallback((product) => {
   if (FIREBASE_ENABLED && isDbReady()) {
