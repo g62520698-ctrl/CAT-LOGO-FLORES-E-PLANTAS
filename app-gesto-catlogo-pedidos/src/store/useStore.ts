@@ -228,7 +228,7 @@ export function useStore() {
           (items) => {
             if (seedingRef.current) return;
             const valid = Array.isArray(items) ? items.filter(isValidProduct) : [];
-            if (valid.length > 0) {
+            if (Array.isArray(valid)) {
               setProducts.current(valid);
               save(SK.PRODUCTS, valid);
             }
@@ -241,7 +241,7 @@ export function useStore() {
           (items) => {
             if (seedingRef.current) return;
             const valid = Array.isArray(items) ? items.filter(isValiduser) : [];
-            if (valid.length > 0) {
+           if (Array.isArray(valid)) {
               setUsers.current(valid);
               save(SK.USERS, valid);
             }
