@@ -356,6 +356,7 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
 
   const counter = load<number>(SK.ORDER_COUNTER, 1);
   const newCounter = counter + 1;
+
   save(SK.ORDER_COUNTER, newCounter);
   setOrderCounterState(newCounter);
 
@@ -369,18 +370,18 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
     bandejas: Math.ceil(item.quantidade / (item.produto.vasos_bandeja || 1)),
   }));
 
-const order: Order = {
-  id: `ORD-${Date.now()}`,
-  numero: counter,
-  usuario: user.login,
-  usuarioNome: user.nome,
-  usuarioRole: user.role,
-  data,
-  hora,
-  dataISO: now.toISOString(),
-  itens,
-  status: 'pendente',
-};
+  const order: Order = {
+    id: ORD-${Date.now()},
+    numero: counter,
+    usuario: user.login,
+    usuarioNome: user.nome,
+    usuarioRole: user.role,
+    data,
+    hora,
+    dataISO: now.toISOString(),
+    itens,
+    status: 'pendente',
+  };
 
   console.log("PEDIDO ENVIADO:", JSON.stringify(order));
 
@@ -389,14 +390,26 @@ const order: Order = {
       .then(ok => {
         console.log("SALVOU NO FIREBASE?", ok);
 
+        // 🔥 sempre atualiza estado local também
+        setOrdersState(prev => {
+          const updated = [order, ...prev];
+          save(SK.ORDERS, updated);
+          return updated;
+        });
+
         if (!ok) {
-          console.warn("Firebase falhou, salvando local");
-          setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+          console.warn("Firebase falhou (mas salvou local)");
         }
       })
       .catch(err => {
         console.error("ERRO AO SALVAR PEDIDO:", err);
-        setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+
+        // fallback
+        setOrdersState(prev => {
+          const updated = [order, ...prev];
+          save(SK.ORDERS, updated);
+          return updated;
+        });
       });
 
   } else {
