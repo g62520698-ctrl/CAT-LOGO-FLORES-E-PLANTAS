@@ -248,14 +248,15 @@ export function useStore() {
           }
         );
 
-        const unsubOrds = fbListen<Order>(
-          COLLECTIONS.ORDERS,
-          (items) => {
-            const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
-            setOrders.current(Array.isArray(valid) ? valid : []);
-            save(SK.ORDERS, valid);
-          }
-        );
+     const unsubOrds = fbListen<Order>(
+  COLLECTIONS.ORDERS,
+  (items) => {
+    const valid = Array.isArray(items) ? items.filter(isValidOrder) : [];
+
+    setOrders.current(valid);
+    save(SK.ORDERS, valid);
+  }
+);
 
         // Store unsubs for cleanup (unused var suppressed)
         void [unsubProds, unsubUsers, unsubOrds];
