@@ -371,7 +371,7 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
   }));
 
   const order: Order = {
-    id: ORD-${Date.now()},
+id: `ORD-${Date.now()}`,
     numero: counter,
     usuario: user.login,
     usuarioNome: user.nome,
