@@ -350,22 +350,27 @@ export function useStore() {
 const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | null => {
   if (!user || cartItems.length === 0) return null;
 
-  const now    = new Date();
-  const data   = now.toLocaleDateString('pt-BR');
-  const hora   = now.toLocaleTimeString('pt-BR');
+  const now = new Date();
+  const data = now.toLocaleDateString('pt-BR');
+  const hora = now.toLocaleTimeString('pt-BR');
+
   const counter = load<number>(SK.ORDER_COUNTER, 1);
   const newCounter = counter + 1;
   save(SK.ORDER_COUNTER, newCounter);
   setOrderCounterState(newCounter);
 
-  // 🔥 ITENS LEVES (CORRETO)
+  // ✅ ITENS LEVES (SEM IMAGEM)
   const itens: OrderItem[] = cartItems.map(item => ({
     codigo_produto: item.produto.codigo,
-    quantidade: item.quantidade
+    nome: item.produto.nome,
+    quantidade: item.quantidade,
+    quantidade_minima_camada: item.produto.quantidade_minima_camada,
+    vasos_bandeja: item.produto.vasos_bandeja,
+    bandejas: Math.ceil(item.quantidade / (item.produto.vasos_bandeja || 1)),
   }));
 
   const order: Order = {
-    id: `ORD-${Date.now()}`,
+    id: ORD-${Date.now()},
     numero: counter,
     usuario: user.login,
     usuarioNome: user.nome,
@@ -376,6 +381,40 @@ const finalizeOrder = useCallback((user: User, cartItems: CartItem[]): Order | n
     itens,
     status: 'pendente',
   };
+
+  console.log("PEDIDO ENVIADO:", JSON.stringify(order));
+
+  if (FIREBASE_ENABLED && isDbReady()) {
+    fbSet(COLLECTIONS.ORDERS, order.id, order)
+      .then(ok => {
+        console.log("SALVOU NO FIREBASE?", ok);
+
+        if (!ok) {
+          console.warn("Firebase falhou, salvando local");
+          setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+        }
+      })
+      .catch(err => {
+        console.error("ERRO AO SALVAR PEDIDO:", err);
+        setOrdersState(prev => [order, ...prev.slice(0, 20)]);
+      });
+
+  } else {
+    // fallback offline
+    setOrdersState(prev => {
+      const updated = [order, ...prev];
+      save(SK.ORDERS, updated);
+      return updated;
+    });
+  }
+
+  // limpa carrinho
+  setCartState([]);
+  save(SK.CART, []);
+
+  return order;
+
+}, []);
 
   // 🔍 DEBUG
 console.log("PEDIDO ENVIADO:", JSON.stringify(order));
