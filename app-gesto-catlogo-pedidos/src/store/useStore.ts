@@ -390,29 +390,50 @@ if (FIREBASE_ENABLED && isDbReady()) {
 
     console.log("✅ Pedido salvo no Firebase");
 
-    setOrdersState(prev => {
+setOrdersState(prev => {
   const safePrev = Array.isArray(prev) ? prev : [];
   const updated = [order, ...safePrev];
-      return updated;
-    });
+
+  try {
+    save(SK.ORDERS, updated);
+  } catch {
+    console.warn("⚠️ Storage cheio (orders)");
+  }
+
+  return updated;
+});
 
   } catch (err) {
     console.error("❌ ERRO AO SALVAR PEDIDO:", err);
 
     // fallback local
-    setOrdersState(prev => {
+setOrdersState(prev => {
   const safePrev = Array.isArray(prev) ? prev : [];
   const updated = [order, ...safePrev];
-      return updated;
-    });
+
+  try {
+    save(SK.ORDERS, updated);
+  } catch {
+    console.warn("⚠️ Storage cheio (orders)");
+  }
+
+  return updated;
+});
   }
 
 } else {
-  setOrdersState(prev => {
+setOrdersState(prev => {
   const safePrev = Array.isArray(prev) ? prev : [];
   const updated = [order, ...safePrev];
-    return updated;
-  });
+
+  try {
+    save(SK.ORDERS, updated);
+  } catch {
+    console.warn("⚠️ Storage cheio (orders)");
+  }
+
+  return updated;
+});
 }
   setCartState([]);
   save(SK.CART, []);
