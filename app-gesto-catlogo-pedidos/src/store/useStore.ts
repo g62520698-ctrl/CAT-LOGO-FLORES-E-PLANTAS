@@ -410,8 +410,8 @@ if (FIREBASE_ENABLED && isDbReady()) {
     console.log("✅ Pedido salvo no Firebase");
 
     setOrdersState(prev => {
-      const updated = [order, ...prev];
-      save(SK.ORDERS, updated);
+  const safePrev = Array.isArray(prev) ? prev : [];
+  const updated = [order, ...safePrev];
       return updated;
     });
 
@@ -420,16 +420,16 @@ if (FIREBASE_ENABLED && isDbReady()) {
 
     // fallback local
     setOrdersState(prev => {
-      const updated = [order, ...prev];
-      save(SK.ORDERS, updated);
+  const safePrev = Array.isArray(prev) ? prev : [];
+  const updated = [order, ...safePrev];
       return updated;
     });
   }
 
 } else {
   setOrdersState(prev => {
-    const updated = [order, ...prev];
-    save(SK.ORDERS, updated);
+  const safePrev = Array.isArray(prev) ? prev : [];
+  const updated = [order, ...safePrev];
     return updated;
   });
 }
