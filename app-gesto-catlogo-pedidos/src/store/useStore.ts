@@ -257,26 +257,28 @@ useEffect(() => {
         }
       );
 
-      void [unsubProds, unsubUsers, unsubOrds];
-
-      _firebaseInitDone = true;
-      setFirebaseStatus('online');
-      console.log('[Store] ✅ Firebase sync ativo');
+if (mountedRef.current) {
+        setFirebaseStatus('online');
+        console.log('[Store] ✅ Firebase sync ativo');
+      }
 
     } catch (e) {
       console.error('[Store] Firebase init error:', e);
-      setFirebaseStatus('offline');
-      seedingRef.current = false;
+
+      if (mountedRef.current) {
+        setFirebaseStatus('offline');
+        seedingRef.current = false;
+      }
     }
   };
 
-  // 🔥 ISSO ESTAVA FALTANDO
   init();
 
   return () => {
     mountedRef.current = false;
   };
 
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
   // ── Auth ───────────────────────────────────────────────────────────────────
