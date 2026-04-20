@@ -533,7 +533,11 @@ const addUser = useCallback((user: User) => {
       if (!order) return prev;
       const updated_order = { ...order, status: 'concluido' as const };
       const updated = prev.map(o => o.id === id ? updated_order : o);
-      save(SK.ORDERS, updated);
+     try {
+  save(SK.ORDERS, updated);
+} catch {
+  console.warn("⚠️ Storage cheio (orders)");
+}
       if (FIREBASE_ENABLED && isDbReady()) {
         fbSet(COLLECTIONS.ORDERS, id, updated_order);
       }
@@ -547,7 +551,11 @@ const addUser = useCallback((user: User) => {
     } else {
       setOrdersState(prev => {
         const updated = prev.filter(o => o.id !== id);
-        save(SK.ORDERS, updated);
+        try {
+  save(SK.ORDERS, updated);
+} catch {
+  console.warn("⚠️ Storage cheio (orders)");
+}
         return updated;
       });
     }
