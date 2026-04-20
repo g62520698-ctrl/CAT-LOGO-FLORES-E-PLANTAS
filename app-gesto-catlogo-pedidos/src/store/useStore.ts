@@ -289,7 +289,14 @@ export function useStore() {
         console.log('[Store] ✅ Firebase sync ativo');
       }
 
-    }
+    };
+
+    init();
+
+return () => {
+  mountedRef.current = false;
+};
+}, []);
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const setCurrentUser = useCallback((u: User | null, keepLoggedIn = false) => {
