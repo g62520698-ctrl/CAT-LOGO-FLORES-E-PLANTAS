@@ -252,24 +252,24 @@ export function useStore() {
           }
         );
 
-     const unsubOrds = fbListen<Order>(
+  const unsubOrds = fbListen<Order>(
   COLLECTIONS.ORDERS,
   (items) => {
     if (!Array.isArray(items)) {
-  console.warn("⚠️ items inválido no listener de orders:", items);
-  return;
-}
+      console.warn("⚠️ items inválido:", items);
+      return;
+    }
 
-const valid = items.filter(isValidOrder);
+    const valid = items.filter(isValidOrder);
 
-// 🔒 NÃO ATUALIZA COM ARRAY VAZIO SE JÁ TEM DADOS
-if (valid.length === 0) {
-  console.warn("⚠️ lista vazia ignorada (evita crash)");
-  return;
-}
-
-setOrders.current(valid);
-save(SK.ORDERS, valid);
+    // 🔥 GARANTE ARRAY SEMPRE
+    setOrders.current(valid || []);
+    
+    try {
+      save(SK.ORDERS, valid);
+    } catch {
+      console.warn("Storage cheio (orders)");
+    }
   }
 );
 
