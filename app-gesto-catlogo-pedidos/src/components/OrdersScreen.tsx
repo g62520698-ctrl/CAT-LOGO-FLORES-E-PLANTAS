@@ -86,10 +86,12 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
           </div>
           <div className="flex items-center gap-1">
             <Package className="w-3 h-3" />
-            <span>{order.itens.length} item(ns)</span>
+            <span>{Array.isArray(order.itens) ? order.itens.length : 0} item(ns)</span>
           </div>
           <span className="font-semibold" style={{ color: '#15803d' }}>
-            {order.itens.reduce((s, i) => s + i.quantidade, 0)} vasos
+            {Array.isArray(order.itens)
+  ? order.itens.reduce((s, i) => s + i.quantidade, 0)
+  : 0} vasos
           </span>
         </div>
       </button>
@@ -289,7 +291,8 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
               </div>
 
               <div className="divide-y" style={{ borderColor: '#f0f9f4' }}>
-                {selectedOrder.itens.map(item => {
+                {Array.isArray(selectedOrder.itens) &&
+  selectedOrder.itens.map(item => {
                   const step    = item.vasos_bandeja || 1;
                   const bandeja = step > 0 ? Math.ceil(item.quantidade / step) : 0;
                   return (
@@ -321,7 +324,9 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
               <div className="flex items-center justify-between px-4 py-3" style={{ background: '#f8fdf9', borderTop: '1px solid #e8f3ec' }}>
                 <span className="text-sm font-bold" style={{ color: '#1a3d28' }}>Total de vasos</span>
                 <span className="text-lg font-bold" style={{ color: '#15803d' }}>
-                  {selectedOrder.itens.reduce((s, i) => s + i.quantidade, 0)}
+                  {Array.isArray(selectedOrder.itens)
+  ? selectedOrder.itens.reduce((s, i) => s + i.quantidade, 0)
+  : 0}
                 </span>
               </div>
             </div>
