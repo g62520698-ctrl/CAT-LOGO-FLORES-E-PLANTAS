@@ -236,26 +236,28 @@ useEffect(() => {
       );
 
       const unsubOrds = fbListen<Order>(
-        COLLECTIONS.ORDERS,
-        (items) => {
-          if (!Array.isArray(items)) return;
+  COLLECTIONS.ORDERS,
+  (items) => {
+    if (seedingRef.current) return;
 
-          const valid = items
-            .filter(isValidOrder)
-            .map(o => ({
-              ...o,
-              itens: Array.isArray(o.itens) ? o.itens : []
-            }));
+    const safeItems = Array.isArray(items) ? items : [];
 
-          setOrders.current(valid);
+    const valid = safeItems
+      .filter(isValidOrder)
+      .map(o => ({
+        ...o,
+        itens: Array.isArray(o.itens) ? o.itens : []
+      }));
 
-          try {
-            save(SK.ORDERS, valid);
-          } catch {
-            console.warn("Storage cheio (orders)");
-          }
-        }
-      );
+    setOrders.current(valid);
+
+    try {
+      save(SK.ORDERS, valid);
+    } catch (e) {
+      console.error('Erro ao salvar orders no cache:', e);
+    }
+  }
+);
 
 if (mountedRef.current) {
         setFirebaseStatus('online');
