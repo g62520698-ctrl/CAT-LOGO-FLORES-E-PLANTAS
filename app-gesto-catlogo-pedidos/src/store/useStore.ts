@@ -156,7 +156,7 @@ export function useStore() {
   const mountedRef = useRef(true);
 
   // ── Firebase init ──────────────────────────────────────────────────────────
- useEffect(() => {
+useEffect(() => {
   mountedRef.current = true;
 
   if (!FIREBASE_ENABLED || !isDbReady()) {
@@ -185,7 +185,6 @@ export function useStore() {
       const vProds = fbProds.filter(isValidProduct);
       const vUsers = fbUsers.filter(isValidUser);
 
-      // 🔥 CORREÇÃO: garante itens sempre array
       const vOrds = fbOrds
         .filter(isValidOrder)
         .map(o => ({
@@ -200,75 +199,52 @@ export function useStore() {
         const toSeed = local.length > 0 ? local : defaultProducts;
         await Promise.all(toSeed.map(p => fbSet(COLLECTIONS.PRODUCTS, p.codigo, p)));
       } else {
-        if (mountedRef.current) {
-          setProducts.current(vProds);
-        }
+        setProducts.current(vProds);
       }
 
       if (vUsers.length === 0) {
-        console.log("Criando usuários no Firebase...");
         await Promise.all(defaultUsers.map(u =>
           fbSet(COLLECTIONS.USERS, u.id, u)
         ));
       } else {
-        if (mountedRef.current) {
-          setUsers.current(vUsers);
-          save(SK.USERS, vUsers);
-        }
+        setUsers.current(vUsers);
+        save(SK.USERS, vUsers);
       }
 
-      if (mountedRef.current) {
-        setOrders.current(vOrds);
-        save(SK.ORDERS, vOrds);
-      }
+      setOrders.current(vOrds);
+      save(SK.ORDERS, vOrds);
 
       seedingRef.current = false;
-      if (!mountedRef.current) return;
-
-      // ───── LISTENERS ─────
 
       const unsubProds = fbListen<Product>(
         COLLECTIONS.PRODUCTS,
         (items) => {
           if (seedingRef.current) return;
-
-          const valid = Array.isArray(items)
-            ? items.filter(isValidProduct)
-            : [];
-
+          const valid = Array.isArray(items) ? items.filter(isValidProduct) : [];
           setProducts.current(valid);
-        },
-        () => setFirebaseStatus('offline')
+        }
       );
 
       const unsubUsers = fbListen<User>(
         COLLECTIONS.USERS,
         (items) => {
           if (seedingRef.current) return;
-
-          const valid = Array.isArray(items)
-            ? items.filter(isValidUser)
-            : [];
-
+          const valid = Array.isArray(items) ? items.filter(isValidUser) : [];
           setUsers.current(valid);
           save(SK.USERS, valid);
         }
       );
 
-      // 🔥🔥🔥 AQUI ESTAVA O PROBLEMA REAL
       const unsubOrds = fbListen<Order>(
         COLLECTIONS.ORDERS,
         (items) => {
-          if (!Array.isArray(items)) {
-            console.warn("⚠️ items inválido:", items);
-            return;
-          }
+          if (!Array.isArray(items)) return;
 
           const valid = items
             .filter(isValidOrder)
             .map(o => ({
               ...o,
-              itens: Array.isArray(o.itens) ? o.itens : [] // 🔥 CORREÇÃO PRINCIPAL
+              itens: Array.isArray(o.itens) ? o.itens : []
             }));
 
           setOrders.current(valid);
@@ -282,21 +258,26 @@ export function useStore() {
       );
 
       void [unsubProds, unsubUsers, unsubOrds];
-      _firebaseInitDone = true;
 
-if (mountedRef.current) {
-        setFirebaseStatus('online');
-        console.log('[Store] ✅ Firebase sync ativo');
-      }
+      _firebaseInitDone = true;
+      setFirebaseStatus('online');
+      console.log('[Store] ✅ Firebase sync ativo');
 
     } catch (e) {
       console.error('[Store] Firebase init error:', e);
-      if (mountedRef.current) {
-        setFirebaseStatus('offline');
-        seedingRef.current = false;
-      }
+      setFirebaseStatus('offline');
+      seedingRef.current = false;
     }
   };
+
+  // 🔥 ISSO ESTAVA FALTANDO
+  init();
+
+  return () => {
+    mountedRef.current = false;
+  };
+
+}, []);
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const setCurrentUser = useCallback((u: User | null, keepLoggedIn = false) => {
