@@ -240,7 +240,7 @@ export function useStore() {
           COLLECTIONS.USERS,
           (items) => {
             if (seedingRef.current) return;
-            const valid = Array.isArray(items) ? items.filter(isValiduser) : [];
+            const valid = Array.isArray(items) ? items.filter(isValidUser) : [];
            if (Array.isArray(valid)) {
               setUsers.current(valid);
               save(SK.USERS, valid);
