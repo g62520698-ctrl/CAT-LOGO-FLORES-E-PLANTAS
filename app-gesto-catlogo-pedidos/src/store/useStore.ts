@@ -230,7 +230,11 @@ export function useStore() {
             const valid = Array.isArray(items) ? items.filter(isValidProduct) : [];
             if (Array.isArray(valid)) {
               setProducts.current(valid);
-              save(SK.PRODUCTS, valid);
+            try {
+  save(SK.PRODUCTS, valid);
+} catch (e) {
+  console.warn("⚠️ Storage cheio, ignorando save de produtos");
+}
             }
           },
           () => setFirebaseStatus('offline')
