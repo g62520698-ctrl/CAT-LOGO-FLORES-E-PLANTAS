@@ -265,7 +265,7 @@ const valid = items.filter(isValidOrder);
 
 if (!Array.isArray(valid)) return; // 🔥 segurança extra
     // 🔥 GARANTE ARRAY SEMPRE
-    setOrders.current(valid || []);
+    setOrders.current(Array.isArray(valid) ? valid : []);
     
     try {
       save(SK.ORDERS, valid);
