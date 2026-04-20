@@ -156,151 +156,140 @@ export function useStore() {
   const mountedRef = useRef(true);
 
   // ── Firebase init ──────────────────────────────────────────────────────────
-  useEffect(() => {
-    mountedRef.current = true;
+ useEffect(() => {
+  mountedRef.current = true;
 
-    if (!FIREBASE_ENABLED || !isDbReady()) {
-      setFirebaseStatus('offline');
-      return;
-    }
-
-    // Only init once globally across StrictMode double-renders
-    if (_firebaseInitDone) {
-      setFirebaseStatus('online');
-      return;
-    }
-
-    const init = async () => {
-      if (!mountedRef.current) return;
-      setFirebaseStatus('syncing');
-
-      try {
-        // Step 1: Pull existing data
-        const [fbProds, fbUsers, fbOrds] = await Promise.all([
-          fbGetAll<Product>(COLLECTIONS.PRODUCTS),
-          fbGetAll<User>(COLLECTIONS.USERS),
-          fbGetAll<Order>(COLLECTIONS.ORDERS),
-        ]);
-
-        if (!mountedRef.current) return;
-
-        const vProds = fbProds.filter(isValidProduct);
-        const vUsers  = fbUsers.filter(isValidUser);
-        const vOrds   = fbOrds.filter(isValidOrder);
-
-        // Step 2: Seed if empty, else apply Firebase data
-        seedingRef.current = true;
-
-        if (vProds.length === 0) {
-          const local = load<Product[]>(SK.PRODUCTS, defaultProducts).filter(isValidProduct);
-          const toSeed = local.length > 0 ? local : defaultProducts;
-          await Promise.all(toSeed.map(p => fbSet(COLLECTIONS.PRODUCTS, p.codigo, p)));
-        } else {
-          if (mountedRef.current) {
-            setProducts.current(vProds);
-           // removido save(SK.PRODUCTS)
-          }
-        }
-
-       if (vUsers.length === 0) {
-  console.log("Criando usuários no Firebase...");
-  await Promise.all(defaultUsers.map(u => 
-    fbSet(COLLECTIONS.USERS, u.id, u)
-  ));
-} else {
-          if (mountedRef.current) {
-            setUsers.current(vUsers);
-            save(SK.USERS, vUsers);
-          }
-        }
-
-        if (mountedRef.current) {
-  setOrders.current(vOrds);
-  save(SK.ORDERS, vOrds);
-}
-        
-        seedingRef.current = false;
-        if (!mountedRef.current) return;
-
-        // Step 3: Set up real-time listeners
-        const unsubProds = fbListen<Product>(
-          COLLECTIONS.PRODUCTS,
-          (items) => {
-            if (seedingRef.current) return;
-            const valid = Array.isArray(items) ? items.filter(isValidProduct) : [];
-            if (Array.isArray(valid)) {
-              setProducts.current(valid);
-            try {
-  // removido save(SK.PRODUCTS)
-} catch (e) {
-  console.warn("⚠️ Storage cheio, ignorando save de produtos");
-}
-            }
-          },
-          () => setFirebaseStatus('offline')
-        );
-
-        const unsubUsers = fbListen<User>(
-          COLLECTIONS.USERS,
-          (items) => {
-            if (seedingRef.current) return;
-            const valid = Array.isArray(items) ? items.filter(isValidUser) : [];
-           if (Array.isArray(valid)) {
-              setUsers.current(valid);
-              save(SK.USERS, valid);
-            }
-          }
-        );
-
-  const unsubOrds = fbListen<Order>(
-  COLLECTIONS.ORDERS,
-  (items) => {
-    if (!Array.isArray(items)) {
-      console.warn("⚠️ items inválido:", items);
-      return;
-    }
-
-    const valid = items.filter(isValidOrder);
-const valid = items.filter(isValidOrder);
-
-if (!Array.isArray(valid)) return; // 🔥 segurança extra
-    // 🔥 GARANTE ARRAY SEMPRE
-    setOrders.current(Array.isArray(valid) ? valid : []);
-    
-    try {
-      save(SK.ORDERS, valid);
-    } catch {
-      console.warn("Storage cheio (orders)");
-    }
+  if (!FIREBASE_ENABLED || !isDbReady()) {
+    setFirebaseStatus('offline');
+    return;
   }
-);
 
-        // Store unsubs for cleanup (unused var suppressed)
-        void [unsubProds, unsubUsers, unsubOrds];
-        _firebaseInitDone = true;
+  if (_firebaseInitDone) {
+    setFirebaseStatus('online');
+    return;
+  }
 
+  const init = async () => {
+    if (!mountedRef.current) return;
+    setFirebaseStatus('syncing');
+
+    try {
+      const [fbProds, fbUsers, fbOrds] = await Promise.all([
+        fbGetAll<Product>(COLLECTIONS.PRODUCTS),
+        fbGetAll<User>(COLLECTIONS.USERS),
+        fbGetAll<Order>(COLLECTIONS.ORDERS),
+      ]);
+
+      if (!mountedRef.current) return;
+
+      const vProds = fbProds.filter(isValidProduct);
+      const vUsers = fbUsers.filter(isValidUser);
+
+      // 🔥 CORREÇÃO: garante itens sempre array
+      const vOrds = fbOrds
+        .filter(isValidOrder)
+        .map(o => ({
+          ...o,
+          itens: Array.isArray(o.itens) ? o.itens : []
+        }));
+
+      seedingRef.current = true;
+
+      if (vProds.length === 0) {
+        const local = load<Product[]>(SK.PRODUCTS, defaultProducts).filter(isValidProduct);
+        const toSeed = local.length > 0 ? local : defaultProducts;
+        await Promise.all(toSeed.map(p => fbSet(COLLECTIONS.PRODUCTS, p.codigo, p)));
+      } else {
         if (mountedRef.current) {
-          setFirebaseStatus('online');
-          console.log('[Store] ✅ Firebase sync ativo');
-        }
-      } catch (e) {
-        console.error('[Store] Firebase init error:', e);
-        if (mountedRef.current) {
-          setFirebaseStatus('offline');
-          seedingRef.current = false;
+          setProducts.current(vProds);
         }
       }
-    };
 
-    init();
+      if (vUsers.length === 0) {
+        console.log("Criando usuários no Firebase...");
+        await Promise.all(defaultUsers.map(u =>
+          fbSet(COLLECTIONS.USERS, u.id, u)
+        ));
+      } else {
+        if (mountedRef.current) {
+          setUsers.current(vUsers);
+          save(SK.USERS, vUsers);
+        }
+      }
 
-    return () => {
-      mountedRef.current = false;
-      // Don't unsub on StrictMode unmount — only on real unmount
-      // _unsubscribers will persist across re-mounts
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      if (mountedRef.current) {
+        setOrders.current(vOrds);
+        save(SK.ORDERS, vOrds);
+      }
+
+      seedingRef.current = false;
+      if (!mountedRef.current) return;
+
+      // ───── LISTENERS ─────
+
+      const unsubProds = fbListen<Product>(
+        COLLECTIONS.PRODUCTS,
+        (items) => {
+          if (seedingRef.current) return;
+
+          const valid = Array.isArray(items)
+            ? items.filter(isValidProduct)
+            : [];
+
+          setProducts.current(valid);
+        },
+        () => setFirebaseStatus('offline')
+      );
+
+      const unsubUsers = fbListen<User>(
+        COLLECTIONS.USERS,
+        (items) => {
+          if (seedingRef.current) return;
+
+          const valid = Array.isArray(items)
+            ? items.filter(isValidUser)
+            : [];
+
+          setUsers.current(valid);
+          save(SK.USERS, valid);
+        }
+      );
+
+      // 🔥🔥🔥 AQUI ESTAVA O PROBLEMA REAL
+      const unsubOrds = fbListen<Order>(
+        COLLECTIONS.ORDERS,
+        (items) => {
+          if (!Array.isArray(items)) {
+            console.warn("⚠️ items inválido:", items);
+            return;
+          }
+
+          const valid = items
+            .filter(isValidOrder)
+            .map(o => ({
+              ...o,
+              itens: Array.isArray(o.itens) ? o.itens : [] // 🔥 CORREÇÃO PRINCIPAL
+            }));
+
+          setOrders.current(valid);
+
+          try {
+            save(SK.ORDERS, valid);
+          } catch {
+            console.warn("Storage cheio (orders)");
+          }
+        }
+      );
+
+      void [unsubProds, unsubUsers, unsubOrds];
+      _firebaseInitDone = true;
+
+      if (mountedRef.current) {
+        setFirebaseStatus('online');
+        console.log('[Store] ✅ Firebase sync ativo');
+      }
+
+    }
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const setCurrentUser = useCallback((u: User | null, keepLoggedIn = false) => {
