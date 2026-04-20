@@ -261,7 +261,9 @@ export function useStore() {
     }
 
     const valid = items.filter(isValidOrder);
+const valid = items.filter(isValidOrder);
 
+if (!Array.isArray(valid)) return; // 🔥 segurança extra
     // 🔥 GARANTE ARRAY SEMPRE
     setOrders.current(valid || []);
     
