@@ -198,7 +198,7 @@ export function useStore() {
         } else {
           if (mountedRef.current) {
             setProducts.current(vProds);
-            save(SK.PRODUCTS, vProds);
+           // removido save(SK.PRODUCTS)
           }
         }
 
@@ -231,7 +231,7 @@ export function useStore() {
             if (Array.isArray(valid)) {
               setProducts.current(valid);
             try {
-  save(SK.PRODUCTS, valid);
+  // removido save(SK.PRODUCTS)
 } catch (e) {
   console.warn("⚠️ Storage cheio, ignorando save de produtos");
 }
