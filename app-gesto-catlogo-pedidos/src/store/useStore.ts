@@ -284,12 +284,19 @@ export function useStore() {
       void [unsubProds, unsubUsers, unsubOrds];
       _firebaseInitDone = true;
 
-      if (mountedRef.current) {
+if (mountedRef.current) {
         setFirebaseStatus('online');
         console.log('[Store] ✅ Firebase sync ativo');
       }
 
-    };
+    } catch (e) {
+      console.error('[Store] Firebase init error:', e);
+      if (mountedRef.current) {
+        setFirebaseStatus('offline');
+        seedingRef.current = false;
+      }
+    }
+  };
 
   // ── Auth ───────────────────────────────────────────────────────────────────
   const setCurrentUser = useCallback((u: User | null, keepLoggedIn = false) => {
