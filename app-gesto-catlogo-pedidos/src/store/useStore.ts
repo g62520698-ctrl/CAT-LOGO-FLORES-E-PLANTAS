@@ -291,13 +291,6 @@ export function useStore() {
 
     };
 
-    init();
-
-return () => {
-  mountedRef.current = false;
-};
-}, []);
-
   // ── Auth ───────────────────────────────────────────────────────────────────
   const setCurrentUser = useCallback((u: User | null, keepLoggedIn = false) => {
     setCurrentUserState(u);
