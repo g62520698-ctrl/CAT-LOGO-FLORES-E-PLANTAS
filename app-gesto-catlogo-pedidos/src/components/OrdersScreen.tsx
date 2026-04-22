@@ -28,7 +28,11 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
   const visibleOrders = Array.isArray(orders) ? orders : [];
 const pendingOrders = visibleOrders.filter(o => o && o.status === 'pendente');
 const completedOrders = visibleOrders.filter(o => o && o.status === 'concluido');
-  const pendingUsers    = new Set(pendingOrders.map(o => o.usuario)).size;
+const pendingUsers = new Set(
+  pendingOrders
+    .filter(o => o?.usuario)
+    .map(o => o.usuario)
+).size;
 const pendingItems = pendingOrders.reduce((s, o) => {
   if (!o || !Array.isArray(o.itens)) return s;
 
