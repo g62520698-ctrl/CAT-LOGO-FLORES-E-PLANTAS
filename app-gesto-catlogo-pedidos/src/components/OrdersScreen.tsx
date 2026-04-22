@@ -222,7 +222,7 @@ const completedOrders = visibleOrders.filter(o => o?.status === 'concluido');
                 {pendingOrders.map(o => <OrderCard key={o.id} order={o} />)}
               </div>
             )}
-            {completedOrders.length > 0 && (
+            {completedOrders?.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
