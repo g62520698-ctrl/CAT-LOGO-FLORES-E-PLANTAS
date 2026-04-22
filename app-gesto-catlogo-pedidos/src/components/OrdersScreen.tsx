@@ -26,8 +26,8 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   const visibleOrders = Array.isArray(orders) ? orders : [];
-  const pendingOrders   = visibleOrders.filter(o => o.status === 'pendente');
-  const completedOrders = visibleOrders.filter(o => o.status === 'concluido');
+const pendingOrders   = visibleOrders.filter(o => o?.status === 'pendente');
+const completedOrders = visibleOrders.filter(o => o?.status === 'concluido');
   const pendingUsers    = new Set(pendingOrders.map(o => o.usuario)).size;
   const pendingItems    = pendingOrders.reduce((s, o) => s + o.itens.reduce((ss, i) => ss + i.quantidade, 0), 0);
   const isPending       = (o: Order) => o.status === 'pendente';
