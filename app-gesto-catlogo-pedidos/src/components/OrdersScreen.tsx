@@ -29,12 +29,14 @@ export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onD
 const pendingOrders = visibleOrders.filter(o => o && o.status === 'pendente');
 const completedOrders = visibleOrders.filter(o => o && o.status === 'concluido');
   const pendingUsers    = new Set(pendingOrders.map(o => o.usuario)).size;
-   const pendingItems = pendingOrders.reduce(
-  (s, o) => s + (Array.isArray(o.itens)
-    ? o.itens.reduce((ss, i) => ss + i.quantidade, 0)
-    : 0),
-  0
-);
+const pendingItems = pendingOrders.reduce((s, o) => {
+  if (!o || !Array.isArray(o.itens)) return s;
+
+  return s + o.itens.reduce((ss, i) => {
+    return ss + (i?.quantidade || 0);
+  }, 0);
+
+}, 0);
   const isPending       = (o: Order) => o.status === 'pendente';
 
   const OrderCard = ({ order }: { order: Order }) => (
