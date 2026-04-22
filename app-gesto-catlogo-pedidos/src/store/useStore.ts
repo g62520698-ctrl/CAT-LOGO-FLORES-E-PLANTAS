@@ -235,19 +235,34 @@ useEffect(() => {
         }
       );
 
-      const unsubOrds = fbListen<Order>(
+const unsubOrds = fbListen<Order>(
   COLLECTIONS.ORDERS,
   (items) => {
     if (seedingRef.current) return;
 
     const safeItems = Array.isArray(items) ? items : [];
 
-    const valid = safeItems
-      .filter(isValidOrder)
-      .map(o => ({
+    const valid = safeItems.map((o: any) => {
+      let itens = o.itens;
+
+      // 🔥 BLINDAGEM TOTAL
+      if (!Array.isArray(itens)) {
+        if (typeof itens === 'string') {
+          try {
+            itens = JSON.parse(itens);
+          } catch {
+            itens = [];
+          }
+        } else {
+          itens = [];
+        }
+      }
+
+      return {
         ...o,
-        itens: Array.isArray(o.itens) ? o.itens : []
-      }));
+        itens
+      };
+    });
 
     setOrders.current(valid);
 
