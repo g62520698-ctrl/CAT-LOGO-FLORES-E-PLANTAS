@@ -163,7 +163,7 @@ const completedOrders = visibleOrders.filter(o => o?.status === 'concluido');
         </div>
 
         {/* Consolidated export */}
-        {pendingOrders.length > 0 && (
+        {pendingOrders?.length > 0 && (
           <div className="px-3 pb-3 space-y-1">
             <button
               onClick={() => { exportConsolidatedOrdersToExcel(pendingOrders); showToast('📊 Planilha consolidada exportada!'); }}
