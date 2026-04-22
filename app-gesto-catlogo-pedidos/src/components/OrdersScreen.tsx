@@ -201,7 +201,7 @@ const completedOrders = visibleOrders.filter(o => o?.status === 'concluido');
 
       {/* ── Content ── */}
       <div className="scroll-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '12px', display: 'flex', flexDirection: 'column', gap: 16, width: '100%', maxWidth: '100%' }}>
-        {visibleOrders.length === 0 ? (
+        visibleOrders?.length === 0
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: '#e8f5ee', border: '1.5px solid #c6e8d3' }}>
               <ClipboardList className="w-10 h-10" style={{ color: '#86c9a3' }} />
