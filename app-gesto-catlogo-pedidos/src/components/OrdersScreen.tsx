@@ -201,40 +201,47 @@ const completedOrders = visibleOrders.filter(o => o?.status === 'concluido');
 
       {/* ── Content ── */}
       <div className="scroll-container" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '12px', display: 'flex', flexDirection: 'column', gap: 16, width: '100%', maxWidth: '100%' }}>
-        visibleOrders?.length === 0
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: '#e8f5ee', border: '1.5px solid #c6e8d3' }}>
-              <ClipboardList className="w-10 h-10" style={{ color: '#86c9a3' }} />
-            </div>
-            <div className="text-center">
-              <p className="font-bold text-base" style={{ color: '#1a3d28' }}>Nenhum pedido</p>
-              <p className="text-sm mt-1" style={{ color: '#6b9e7e' }}>Os pedidos aparecerão aqui</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {pendingOrders.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <Clock className="w-4 h-4 text-amber-500" />
-                  <p className="text-sm font-bold" style={{ color: '#92400e' }}>Pendentes ({pendingOrders.length})</p>
-                </div>
-                {pendingOrders.map(o => <OrderCard key={o.id} order={o} />)}
-              </div>
-            )}
-            {completedOrders?.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <p className="text-sm font-bold" style={{ color: '#166534' }}>Concluídos ({completedOrders.length})</p>
-                </div>
-                {completedOrders.map(o => <OrderCard key={o.id} order={o} />)}
-              </div>
-            )}
-          </>
-        )}
-        <div className="h-4" />
+
+  {visibleOrders?.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: '#e8f5ee', border: '1.5px solid #c6e8d3' }}>
+        <ClipboardList className="w-10 h-10" style={{ color: '#86c9a3' }} />
       </div>
+      <div className="text-center">
+        <p className="font-bold text-base" style={{ color: '#1a3d28' }}>Nenhum pedido</p>
+        <p className="text-sm mt-1" style={{ color: '#6b9e7e' }}>Os pedidos aparecerão aqui</p>
+      </div>
+    </div>
+  ) : (
+    <>
+      {pendingOrders.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <Clock className="w-4 h-4 text-amber-500" />
+            <p className="text-sm font-bold" style={{ color: '#92400e' }}>
+              Pendentes ({pendingOrders.length})
+            </p>
+          </div>
+          {pendingOrders.map(o => <OrderCard key={o.id} order={o} />)}
+        </div>
+      )}
+
+      {completedOrders.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <p className="text-sm font-bold" style={{ color: '#166534' }}>
+              Concluídos ({completedOrders.length})
+            </p>
+          </div>
+          {completedOrders.map(o => <OrderCard key={o.id} order={o} />)}
+        </div>
+      )}
+    </>
+  )}
+
+  <div className="h-4" />
+</div>
 
       {/* ── Order Detail Modal ── */}
       {selectedOrder && (
