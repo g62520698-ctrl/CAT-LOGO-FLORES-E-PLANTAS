@@ -15,6 +15,11 @@ interface Props {
 }
 
 export default function OrdersScreen({ orders, currentUser, onCompleteOrder, onDeleteOrder }: Props) {
+
+  // 🔥 BLINDAGEM GLOBAL DOS PEDIDOS
+  const safeOrders = Array.isArray(orders)
+    ? orders.filter(o => o && typeof o === 'object')
+    : [];
   const [selectedOrder,      setSelectedOrder]      = useState<Order | null>(null);
   const [confirmAction,      setConfirmAction]      = useState<{ type: 'complete' | 'delete'; id: string } | null>(null);
   const [toast,              setToast]              = useState('');
