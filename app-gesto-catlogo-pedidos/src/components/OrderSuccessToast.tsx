@@ -24,7 +24,7 @@ export default function OrderSuccessToast({ order, onClose }: Props) {
           <div className="flex-1">
             <p className="text-white font-bold text-sm">Pedido #{order.numero} criado!</p>
             <p className="text-gray-400 text-xs mt-0.5">
-              {order.itens.length} produto(s) · {order.itens.reduce((s, i) => s + i.quantidade, 0)} vasos
+              {Array.isArray(order.itens) ? order.itens.length : 0} produto(s) · {Array.isArray(order.itens) ? order.itens.reduce((s, i) => s + (i?.quantidade || 0), 0) : 0} vasos
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1">
