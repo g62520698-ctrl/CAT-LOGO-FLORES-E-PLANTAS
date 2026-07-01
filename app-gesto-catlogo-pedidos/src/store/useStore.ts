@@ -406,10 +406,11 @@ if (FIREBASE_ENABLED && isDbReady()) {
     await fbSet(COLLECTIONS.ORDERS, order.id, order);
 
     console.log("✅ Pedido salvo no Firebase");
-
+    
 setOrdersState(prev => {
   const safePrev = Array.isArray(prev) ? prev : [];
-  const updated = [order, ...safePrev];
+  const alreadyExists = safePrev.some(o => o?.id === order.id);
+  const updated = alreadyExists ? safePrev : [order, ...safePrev];
 
   try {
     save(SK.ORDERS, updated);
